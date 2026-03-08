@@ -27,6 +27,5 @@ case
 county,
 state,
 country,
-recordedBy,
 institution_code
 FROM {{ref('stg_elk_sightings')}}
