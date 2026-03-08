@@ -56,7 +56,7 @@ Orchestrated end-to-end by Apache Airflow (Docker)
 wildlife-lakehouse/
 ├── dags/                   # Airflow DAG definitions
 ├── scripts/                # Python ingestion scripts
-├── dbt/                    # dbt models and transformations (in progress)
+├── dbt/                    # dbt models and transformations
 ├── config/                 # GCP credentials (gitignored)
 ├── docker-compose.yaml     # Airflow local environment
 ├── Dockerfile              
@@ -113,7 +113,6 @@ wildlife-lakehouse/
 
 - [ ] Convert ingestion notebook to a production Python script
 - [ ] Wire ingestion into an Airflow DAG on a weekly schedule
-- [ ] Set up dbt Core with curated transformation models
 - [ ] Add data quality checks and automated validation
 - [ ] Build Tableau Public dashboard with sighting trends and geographic distribution
 - [ ] Add metadata and lineage documentation
