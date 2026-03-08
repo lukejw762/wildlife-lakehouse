@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: stg_elk_sightings
+    columns:
+      - name: gbifID
+        tests:
+          - unique
+          - not_null
+      - name: occurrenceID
+        tests:
+          - unique
+          - not_null
+      - name: sighting_date
+        tests:
+          - not_null
+      - name: latitude
+        tests:
+          - not_null
+      - name: longitude
+        tests:
+          - not_null
+      - name: state
+        tests:
+          - not_null
+     

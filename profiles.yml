@@ -1,0 +1,12 @@
+wildlife_lakehouse:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: wildlife-lakehouse
+      dataset: wildlife_raw
+      threads: 4
+      timeout_seconds: 300
+      location: US
+      keyfile: /tmp/keyfile.json

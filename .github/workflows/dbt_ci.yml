@@ -1,0 +1,42 @@
+name: dbt CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  dbt-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dbt
+        run: pip install dbt-bigquery
+
+      - name: Set up GCP credentials
+        run: |
+          echo '${{ secrets.GCP_CREDENTIALS }}' > /tmp/keyfile.json
+
+      - name: dbt debug
+        run: dbt debug --project-dir wildlife_lakehouse
+        env:
+          DBT_PROFILES_DIR: .
+
+      - name: dbt run
+        run: dbt run --project-dir wildlife_lakehouse
+        env:
+          DBT_PROFILES_DIR: .
+
+      - name: dbt test
+        run: dbt test --project-dir wildlife_lakehouse
+        env:
+          DBT_PROFILES_DIR: .

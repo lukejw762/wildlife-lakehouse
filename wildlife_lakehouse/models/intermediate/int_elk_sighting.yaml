@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: int_elk_sightings
+    columns:
+      - name: gbifID
+        tests:
+          - not_null
+      - name: coordinate_quality
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["high", "medium", "low"]
+      - name: season
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["winter", "spring", "summer","fall"]
