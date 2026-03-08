@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: wildlife_raw
+    database: wildlife-lakehouse
+    schema: wildlife_raw
+    tables:
+      - name: elk_sighting_raw
