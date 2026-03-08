@@ -56,7 +56,7 @@ Orchestrated end-to-end by Apache Airflow (Docker)
 wildlife-lakehouse/
 ├── dags/                   # Airflow DAG definitions
 ├── scripts/                # Python ingestion scripts
-├── dbt/                    # dbt models and transformations
+├── wildlife_lakehouse/     # dbt models and transformations
 ├── config/                 # GCP credentials (gitignored)
 ├── docker-compose.yaml     # Airflow local environment
 ├── Dockerfile              
