@@ -1,6 +1,6 @@
 # Wildlife Lakehouse
 
-An end-to-end data engineering portfolio project that ingests elk occurrence data from a public REST API, loads it into a cloud data warehouse, and transforms it into curated analytical models — demonstrating modern lakehouse patterns including ELT pipeline orchestration, dimensional modeling, and automated data quality frameworks.
+An end-to-end data engineering portfolio project that ingests elk occurrence data from a public REST API, loads it into a cloud data warehouse, and transforms it into curated analytical models. The core concepts demonstrated include modern lakehouse patterns including ELT pipeline orchestration, dimensional modeling, and automated data quality frameworks.
 
 ## Motivation
 
