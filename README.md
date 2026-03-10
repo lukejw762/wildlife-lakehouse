@@ -4,7 +4,7 @@ An end-to-end data engineering portfolio project that ingests elk occurrence dat
 
 ## Motivation
 
-This project was built to demonstrate practical data engineering skills in a real-world context. Elk population data is directly relevant to wildlife conservation organizations and outdoor technology companies focused on public land mapping and habitat tracking. The dataset is sourced from the **Global Biodiversity Information Facility (GBIF)**, a free public API with over 31,000 elk sighting records across the United States.
+This project was built to demonstrate practical data engineering skills in a real-world context. The dataset is sourced from the **Global Biodiversity Information Facility (GBIF)**, a free public API with over 31,000 elk sighting records across the United States.
 
 ## Architecture
 
@@ -32,7 +32,7 @@ dbt Marts Layer — wildlife_marts
 (star schema: facts, dimensions, aggregations)
      │
      ▼
-Tableau Public Dashboard
+Tableau Public Dashboard (in progress)
 (sighting trends, geographic distribution)
 
 Orchestrated end-to-end by Apache Airflow (Docker)
@@ -86,7 +86,6 @@ wildlife-lakehouse/
 │   │       ├── dimensions/
 │   │       │   ├── dim_date.sql
 │   │       │   ├── dim_location.sql
-│   │       │   └── dim_institution.sql
 │   │       ├── facts/
 │   │       │   └── fct_elk_sightings.sql
 │   │       └── aggregations/
@@ -131,7 +130,6 @@ int_elk_sightings       ← season derivation, coordinate quality tiers, validat
         │
         ├──▶ dim_date
         ├──▶ dim_location
-        ├──▶ dim_institution
         ├──▶ fct_elk_sightings
         └──▶ mart_elk_sightings_state_agg
 ```
@@ -187,11 +185,12 @@ dbt test --project-dir wildlife_lakehouse
 ```
 
 ## Roadmap
-- [ ] Wire ingestion and dbt into a full Airflow DAG on a weekly schedule
-- [ ] Complete star schema (dim_date, dim_location, dim_institution, fct_elk_sightings)
-- [ ] Build Tableau Public dashboard with sighting trends and geographic distribution
+- [ ] Wire ingestion and dbt into a full Airflow DAG on a weekly schedule (in progress)
+- [ ] Build Tableau Public dashboard with sighting trends and geographic distribution (in progress)
 - [ ] Add metadata and lineage documentation
-- [ ] Expand dataset to include additional ungulate species (mule deer, pronghorn)
+- [ ] Expand dataset to include additional species (mule deer, pronghorn)
+- [ ] Ingest NOAA weather data by coordinates to enrich sighting records with temperature and precipitation context. To enable multi-source joins and more complex analytical models
+- [ ] Expand CI/CD pipeline to include environment promotion (dev → prod)
 
 ## Data Source
 
