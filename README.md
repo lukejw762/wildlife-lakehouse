@@ -185,7 +185,6 @@ dbt test --project-dir wildlife_lakehouse
 ```
 
 ## Roadmap
-- [ ] Wire ingestion and dbt into a full Airflow DAG on a weekly schedule (in progress)
 - [ ] Build Tableau Public dashboard with sighting trends and geographic distribution (in progress)
 - [ ] Add metadata and lineage documentation
 - [ ] Expand dataset to include additional species (mule deer, pronghorn)
