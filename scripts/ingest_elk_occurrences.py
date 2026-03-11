@@ -4,7 +4,7 @@ import pandas as pd
 from google.cloud import bigquery
 
 
-
+## pull data with API call
 def fetch_sightings(species,country,max_records,limit=300):
     offset = 0 
     base_url = "https://api.gbif.org/v1/occurrence/search"
@@ -14,7 +14,7 @@ def fetch_sightings(species,country,max_records,limit=300):
 
     while endofRecords is False and offset < max_records:
 
-        ## make API call
+        
         r= requests.get(base_url,params=payload)
         result = r.json()
         
@@ -27,9 +27,10 @@ def fetch_sightings(species,country,max_records,limit=300):
     
     return records
 
+## process JSON objects in records list
 def parse_sightings(records):
     cleaned_list = []
-    ## process results
+    
     for row in records:
         filtered_row = {key: value for key, value in row.items() if key in (('gbifID','occurrenceID','decimalLatitude','decimalLongitude','stateProvince','country','eventDate','year','month','day','coordinateUncertaintyInMeters','institutionCode','gadm'))}
         filtered_row['county'] = filtered_row.get('gadm',{}).get('level2',{}).get('name')
