@@ -9,4 +9,4 @@ wildlife_lakehouse:
       threads: 4
       timeout_seconds: 300
       location: US
-      keyfile: /tmp/keyfile.json
+      keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS') }}"
