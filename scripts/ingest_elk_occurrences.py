@@ -1,28 +1,37 @@
+## Imports
 import requests
-import json
-import pandas
+import pandas as pd
+from google.cloud import bigquery
 
 
-offset = 0 
-base_url = "https://api.gbif.org/v1/occurrence/search"
-payload = {"scientificName":"Cervus canadensis","country":"US","limit":300,'orderBy':'eventDate','order':'desc','offset':offset}
-endofRecords = False
-cleaned_list = []
 
+def fetch_sightings(species,country,max_records,limit=300):
+    offset = 0 
+    base_url = "https://api.gbif.org/v1/occurrence/search"
+    payload = {"scientificName":species,"country":country,"limit":limit,'orderBy':'eventDate','order':'desc','offset':offset}
+    endofRecords = False
+    records =[]
 
-while endofRecords is False and offset < 2000:
+    while endofRecords is False and offset < max_records:
 
-    ## make API call
-    r= requests.get(base_url,params=payload)
-    ##print(f"Encoded URL: {r.url}") 
-    ##print(f"JSON Response: {r.json()}")
-    results = r.json()['results']
+        ## make API call
+        r= requests.get(base_url,params=payload)
+        result = r.json()
+        
+        for row in result['results']:
+            records.append(row)
+        
+        offset = offset + limit
+        payload['offset'] = offset
+        endofRecords = result['endOfRecords']
     
+    return records
 
-
+def parse_sightings(records):
+    cleaned_list = []
     ## process results
-    for row in results:
-        filtered_row = {key: value for key, value in row.items() if key in (('gbifID','occurrenceID','decimalLatitude','decimalLongitude','stateProvince','country','eventDate','year','month','day','coordinateUncertaintyInMeters','recordedBy','institutionCode','gadm'))}
+    for row in records:
+        filtered_row = {key: value for key, value in row.items() if key in (('gbifID','occurrenceID','decimalLatitude','decimalLongitude','stateProvince','country','eventDate','year','month','day','coordinateUncertaintyInMeters','institutionCode','gadm'))}
         filtered_row['county'] = filtered_row.get('gadm',{}).get('level2',{}).get('name')
         filtered_row['state'] = filtered_row.get('gadm',{}).get('level1',{}).get('name')
         filtered_row['country'] = filtered_row.get('gadm',{}).get('level0',{}).get('name')
@@ -30,24 +39,54 @@ while endofRecords is False and offset < 2000:
 
         cleaned_list.append(filtered_row)
 
-    ## increment offset
-    offset = offset + 300
-    payload['offset'] = offset
+    df = pd.DataFrame(cleaned_list)
+    df['eventDate'] = pd.to_datetime(df['eventDate'], utc=True, errors='coerce')
+
+    return df
+
+
+def load_to_bigquery(df,table_id,write_disposition):
+## Create Client
     
-    ## update end of records
-    endofRecords = r.json()['endOfRecords']
+    client = bigquery.Client(project=table_id.split(".")[0])
+## Define Schema
+    schema = [
+        bigquery.SchemaField("gbifID", "STRING", mode="REQUIRED"),
+        bigquery.SchemaField("eventDate", "TIMESTAMP", mode="NULLABLE"),
+        bigquery.SchemaField("year", "INT64", mode="NULLABLE"),
+        bigquery.SchemaField("month", "INT64", mode="NULLABLE"),
+        bigquery.SchemaField("day", "INT64", mode="NULLABLE"),
+        bigquery.SchemaField("county", "STRING", mode="NULLABLE"),
+        bigquery.SchemaField("state", "STRING", mode="NULLABLE"),
+        bigquery.SchemaField("stateProvince", "STRING", mode="NULLABLE"),
+        bigquery.SchemaField("country", "STRING", mode="NULLABLE"),
+        bigquery.SchemaField("decimalLatitude", "FLOAT64", mode="NULLABLE"),
+        bigquery.SchemaField("decimalLongitude", "FLOAT64", mode="NULLABLE"),
+        bigquery.SchemaField("occurrenceID", "STRING", mode="NULLABLE"),
+        bigquery.SchemaField("institutionCode", "STRING", mode="NULLABLE"),
+        bigquery.SchemaField("coordinateUncertaintyInMeters", "FLOAT64", mode="NULLABLE")
+    ]
+## Create Job Config
+    job_config = bigquery.LoadJobConfig(
+        schema=schema,
+        write_disposition=write_disposition
+    )
+## Create Job
+    job = client.load_table_from_dataframe(df,table_id,job_config=job_config)
 
-from google.cloud import bigquery
-import os
-import pandas as pd
+    job.result()
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"C:\Users\lukej\Projects\wildlife-lakehouse\config\wildlife-lakehouse-8025d912066e.json"
+    print(f"Loaded {job.output_rows} rows into {table_id}.")
 
-client = bigquery.Client(project="wildlife-lakehouse")
+def ingest_sightings(species,country,max_records,table_id,write_disposition):
+    records = fetch_sightings(species,country,max_records)
+    df = parse_sightings(records)
+    load_to_bigquery(df,table_id,write_disposition)
 
-job = client.load_table_from_dataframe(df,table,config=job_config)
-
-job.result()
-
-print(f"Loaded {job.output_rows} rows into {table_id}.")
-
+if __name__ == "__main__":
+    ingest_sightings(  species="Cervus canadensis",
+        country="US",
+        max_records=2000,
+        table_id="wildlife-lakehouse.wildlife_raw.elk_sighting_raw",
+        write_disposition="WRITE_TRUNCATE"
+        )
